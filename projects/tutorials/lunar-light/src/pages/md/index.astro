@@ -1,0 +1,14 @@
+---
+const posts = await Astro.glob("../posts/*.md");
+// console.log(JSON.stringify(posts, null, 4));
+---
+
+<h1>My Blog</h1>
+
+{
+  posts.map((post) => (
+    <h3>
+      <a href={post.url}>{post.frontmatter.title}</a>
+    </h3>
+  ))
+}
