@@ -1,0 +1,54 @@
+---
+export async function getStaticPaths() {
+  const response = await fetch("http://127.0.0.1:1337/graphql", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: `
+      query{
+        posts {
+          data {
+            id
+            attributes {
+              title
+              slug
+              body
+              image {
+                data {
+                  attributes {
+                    formats
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+    }),
+  });
+
+  // graphql을 사용하면 desturcturing에 주의해야 한다.
+  const {
+    data: {
+      posts: { data },
+    },
+  } = await response.json();
+
+  return data.map((post: any) => {
+    return {
+      params: { slug: post.attributes.slug },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+---
+
+<h2>{post.attributes.title}</h2>
+<p>{post.attributes.body}</p>
+<img
+  src={`http://127.0.0.1:1337${post.attributes.image.data.attributes.formats.small.url}`}
+  alt={post.attributes.image.data.attributes.name}
+/>
